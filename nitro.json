@@ -1,0 +1,17 @@
+{
+  "cxxNamespace": ["messengerengine"],
+  "ios": {
+    "iosModuleName": "MessengerEngine"
+  },
+  "android": {
+    "androidNamespace": ["messengerengine"],
+    "androidCxxLibName": "messengerengine"
+  },
+  "autolinking": {
+    "MessengerEngine": {
+      "swift": "HybridMessengerEngine",
+      "kotlin": "HybridMessengerEngine"
+    }
+  },
+  "ignorePaths": ["node_modules"]
+}
