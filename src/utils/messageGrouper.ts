@@ -44,15 +44,29 @@ export const groupMessagesBySender = (
         currentGroup = [];
       }
 
-      const date = new Date(message.timestamp);
-      result.push({
-        id: `date-${message.id}`,
-        type: 'date-separator',
-        date,
-        formattedDate: formatDateSeparator(date),
-        isToday: isToday(date),
-        isYesterday: isYesterday(date),
-      });
+      // Inverted list: first item = bottom. Push separator for the day we're LEAVING first
+      // (so it appears above that day's messages, e.g. "Today" above "Test"), then for the day we're ENTERING.
+      // When lastMessage is null (first message), skip — no separator for first batch; we add it when we leave that day.
+      if (lastMessage) {
+        const lastDate = new Date(lastMessage.timestamp);
+        result.push({
+          id: `date-${lastMessage.id}-out`,
+          type: 'date-separator',
+          date: lastDate,
+          formattedDate: formatDateSeparator(lastDate),
+          isToday: isToday(lastDate),
+          isYesterday: isYesterday(lastDate),
+        });
+        const date = new Date(message.timestamp);
+        result.push({
+          id: `date-${message.id}`,
+          type: 'date-separator',
+          date,
+          formattedDate: formatDateSeparator(date),
+          isToday: isToday(date),
+          isYesterday: isYesterday(date),
+        });
+      }
     }
 
     const isSameSender =

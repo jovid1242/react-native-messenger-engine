@@ -19,7 +19,7 @@ an extensible rendering system for building production messaging interfaces.
 ## Installation
 
 ```sh
-npm install react-native-messenger-engine react-native-nitro-modules
+npm install react-native-messenger-engine react-native-nitro-modules react-native-keyboard-controller react-native-reanimated react-native-worklets
 ```
 
 > `react-native-nitro-modules` is required because this library uses
@@ -36,6 +36,7 @@ The package exposes two primary entry points:
 
 ```tsx
 import React, { useMemo, useState } from 'react';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
   MessengerEngine,
   type ChatInfo,
@@ -65,26 +66,31 @@ export default function App() {
   );
 
   return (
-    <MessengerEngine
-      chatInfo={chatInfo}
-      currentUser={currentUser}
-      messages={messages}
-      onSendMessage={(text) => {
-        const newMessage: Message = {
-          id: String(Date.now()),
-          type: 'text',
-          text,
-          sender: currentUser,
-          timestamp: new Date(),
-          status: 'sent',
-          reactions: [],
-        };
-        setMessages((prev) => [newMessage, ...prev]);
-      }}
-    />
+    <KeyboardProvider>
+      <MessengerEngine
+        chatInfo={chatInfo}
+        currentUser={currentUser}
+        messages={messages}
+        onSendMessage={(text) => {
+          const newMessage: Message = {
+            id: String(Date.now()),
+            type: 'text',
+            text,
+            sender: currentUser,
+            timestamp: new Date(),
+            status: 'sent',
+            reactions: [],
+          };
+          setMessages((prev) => [newMessage, ...prev]);
+        }}
+      />
+    </KeyboardProvider>
   );
 }
 ```
+
+> Important: wrap app root with `KeyboardProvider` from
+> `react-native-keyboard-controller`.
 
 ## Customization Example
 

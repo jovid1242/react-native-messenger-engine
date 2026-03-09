@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import type { Message } from '../../types';
+import type { Message, MessengerTheme } from '../../types';
 import { compactReactions } from '../../utils/reactionHelpers';
 import { formatMessageTime } from '../../utils/dateFormatter';
 import { ReactionBadge } from '../common/ReactionBadge';
@@ -13,11 +13,21 @@ interface MessageItemProps {
   message: Message;
   isCurrentUser: boolean;
   timeFormat?: '12h' | '24h';
+  theme?: MessengerTheme;
 }
 
+const defaultBubbleOutgoing = '#30357a';
+const defaultBubbleIncoming = '#1a1d2a';
+const defaultTimeColor = '#7f87a4';
+const defaultStatusColor = '#8690ff';
+
 export const MessageItem = memo<MessageItemProps>(
-  ({ message, isCurrentUser, timeFormat = '24h' }) => {
+  ({ message, isCurrentUser, timeFormat = '24h', theme }) => {
     const reactions = compactReactions(message.reactions);
+    const userBg = theme?.colors?.userMessage ?? defaultBubbleOutgoing;
+    const otherBg = theme?.colors?.otherMessage ?? defaultBubbleIncoming;
+    const timeColor = theme?.colors?.mutedText ?? defaultTimeColor;
+    const statusColor = theme?.colors?.primary ?? defaultStatusColor;
 
     return (
       <View
@@ -29,14 +39,16 @@ export const MessageItem = memo<MessageItemProps>(
         <View
           style={[
             styles.bubble,
-            isCurrentUser ? styles.userBubble : styles.otherBubble,
+            isCurrentUser
+              ? [styles.userBubble, { backgroundColor: userBg }]
+              : [styles.otherBubble, { backgroundColor: otherBg }],
           ]}
         >
           {message.isDeleted || message.type === 'deleted' ? (
             <DeletedMessage />
           ) : null}
           {message.type === 'text' && !message.isDeleted ? (
-            <TextMessage message={message} />
+            <TextMessage message={message} theme={theme} />
           ) : null}
           {message.type === 'image' && !message.isDeleted ? (
             <MediaMessage message={message} />
@@ -45,11 +57,11 @@ export const MessageItem = memo<MessageItemProps>(
             <StickerMessage message={message} />
           ) : null}
           <View style={styles.meta}>
-            <Text style={styles.time}>
+            <Text style={[styles.time, { color: timeColor }]}>
               {formatMessageTime(new Date(message.timestamp), timeFormat)}
             </Text>
             {isCurrentUser ? (
-              <Text style={styles.status}>
+              <Text style={[styles.status, { color: statusColor }]}>
                 {message.status === 'read' ? '✓✓' : '✓'}
               </Text>
             ) : null}
@@ -71,22 +83,19 @@ export const MessageItem = memo<MessageItemProps>(
 
 const styles = StyleSheet.create({
   bubble: {
-    borderRadius: 16,
+    borderRadius: 20,
     maxWidth: '85%',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   meta: {
     alignItems: 'center',
     flexDirection: 'row',
     gap: 6,
     justifyContent: 'flex-end',
-    marginTop: 6,
+    marginTop: 2,
   },
-  otherBubble: {
-    backgroundColor: '#1a1d2a',
-    borderTopLeftRadius: 6,
-  },
+  otherBubble: {},
   reactionsRow: {
     alignItems: 'flex-start',
     flexDirection: 'row',
@@ -94,17 +103,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   status: {
-    color: '#8690ff',
     fontSize: 12,
   },
   time: {
-    color: '#7f87a4',
     fontSize: 12,
   },
-  userBubble: {
-    backgroundColor: '#30357a',
-    borderTopRightRadius: 6,
-  },
+  userBubble: {},
   wrapper: {
     marginVertical: 2,
   },

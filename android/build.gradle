@@ -35,7 +35,9 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 apply from: '../nitrogen/generated/android/messengerengine+autolinking.gradle'
 
-apply plugin: "com.facebook.react"
+// Do not apply React Native plugin: this library has no Fabric components.
+// Applying it would run codegen for app dependencies (e.g. react-native-keyboard-controller)
+// and cause duplicate class errors when the app also links that package.
 
 android {
   namespace "com.margelo.nitro.messengerengine"

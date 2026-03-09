@@ -1,5 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import type { MessengerEngineProps } from '../types';
 import { useMessages } from '../hooks/useMessages';
 import { useReply } from '../hooks/useReply';
@@ -60,7 +61,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
+      keyboardVerticalOffset={0}
       style={[
         styles.container,
         { backgroundColor: mergedTheme.colors.background },
@@ -79,15 +81,18 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           currentUser={currentUser}
           groupByUser={groupMessagesByUser}
           groupThreshold={groupMessagesThreshold}
+          isGroup={chatInfo.isGroup}
           messages={parsedMessages}
           onLoadMore={props.onLoadMore}
           renderDateSeparator={renderDateSeparator}
+          theme={mergedTheme}
           renderMessage={
             renderMessage ??
             ((messageProps) => (
               <MessageItem
                 isCurrentUser={messageProps.isCurrentUser}
                 message={messageProps.message}
+                theme={mergedTheme}
                 timeFormat={timeFormat}
               />
             ))
@@ -107,6 +112,7 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           onAttachmentPress={onAttachmentPress}
           onChangeText={setText}
           onSend={handleSend}
+          theme={mergedTheme}
           value={text}
         />
       )}
