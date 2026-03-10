@@ -7,6 +7,7 @@ import { useReply } from '../hooks/useReply';
 import { defaultTheme } from '../theme/defaultTheme';
 import { Header } from './Header/Header';
 import { InputToolbar } from './InputToolbar/InputToolbar';
+import { MessageContextMenu } from './MessageList/MessageContextMenu';
 import { MessageItem } from './MessageList/MessageItem';
 import { MessageList } from './MessageList/MessageList';
 
@@ -17,13 +18,24 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     messages,
     onAttachmentPress,
     onBackPress,
+    onEmailPress,
     onHeaderTitlePress,
+    onLinkPress,
+    onMentionPress,
+    onMessageCopy,
+    onMessageDelete,
+    onMessageEdit,
+    onMessageForward,
+    onMessageReport,
+    onPhonePress,
+    onReplyPress,
     onSendMessage,
     renderDateSeparator,
     renderHeader,
     renderInputToolbar,
     renderMessage,
     typingUsers,
+    disableReactions,
     disableTypingIndicator,
     groupMessagesByUser = true,
     groupMessagesThreshold = 300000,
@@ -32,7 +44,23 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     theme,
   } = props;
   const [text, setText] = useState('');
+  const [contextMenu, setContextMenu] = useState<{
+    message: import('../types').Message;
+    position: { x: number; y: number; width: number; height: number };
+    isCurrentUser?: boolean;
+  } | null>(null);
   const { replyTo, clearReply } = useReply();
+
+  const handleRequestMessageContextMenu = useCallback(
+    (
+      message: import('../types').Message,
+      position: { x: number; y: number; width: number; height: number },
+      isCurrentUser?: boolean
+    ) => {
+      setContextMenu({ message, position, isCurrentUser });
+    },
+    []
+  );
 
   const parsedMessages = useMessages(messages);
   const mergedTheme = useMemo(
@@ -89,11 +117,17 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
       <View style={styles.listContainer}>
         <MessageList
           currentUser={currentUser}
+          disableReactions={disableReactions}
           groupByUser={groupMessagesByUser}
           groupThreshold={groupMessagesThreshold}
           isGroup={chatInfo.isGroup}
           messages={parsedMessages}
+          onEmailPress={onEmailPress}
           onLoadMore={props.onLoadMore}
+          onLinkPress={onLinkPress}
+          onMentionPress={onMentionPress}
+          onPhonePress={onPhonePress}
+          onRequestMessageContextMenu={handleRequestMessageContextMenu}
           renderDateSeparator={renderDateSeparator}
           theme={mergedTheme}
           renderMessage={
@@ -102,6 +136,12 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
               <MessageItem
                 isCurrentUser={messageProps.isCurrentUser}
                 message={messageProps.message}
+                onEmailPress={onEmailPress}
+                onLinkPress={onLinkPress}
+                onMentionPress={onMentionPress}
+                onPhonePress={onPhonePress}
+                onRequestMessageContextMenu={handleRequestMessageContextMenu}
+                disableReactions={disableReactions}
                 theme={mergedTheme}
                 timeFormat={timeFormat}
               />
@@ -110,6 +150,20 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           timeFormat={timeFormat}
         />
       </View>
+      <MessageContextMenu
+        visible={contextMenu !== null}
+        message={contextMenu?.message ?? null}
+        position={contextMenu?.position ?? { x: 0, y: 0, width: 0, height: 0 }}
+        isCurrentUser={contextMenu?.isCurrentUser}
+        theme={mergedTheme}
+        onClose={() => setContextMenu(null)}
+        onEdit={onMessageEdit}
+        onReplyPress={onReplyPress}
+        onForward={onMessageForward}
+        onCopy={onMessageCopy}
+        onReport={onMessageReport}
+        onDelete={onMessageDelete}
+      />
       {renderInputToolbar ? (
         renderInputToolbar({
           text,

@@ -84,6 +84,8 @@ export interface MessengerTheme {
     inputBackground: string;
     separator: string;
     destructive: string;
+    /** Color for @mentions, links, phone numbers in message text. Defaults to primary. */
+    linkColor?: string;
   };
   typography?: {
     title?: TextStyle;
@@ -144,11 +146,20 @@ export interface MessengerEngineProps {
   onSendImage?: (imageUri: string, replyTo?: ReplyInfo) => void;
   onSendSticker?: (stickerId: string, replyTo?: ReplyInfo) => void;
   onMessageLongPress?: (message: Message) => void;
+  onMessageEdit?: (message: Message) => void;
+  onMessageForward?: (message: Message) => void;
+  onMessageCopy?: (message: Message) => void;
+  onMessageReport?: (message: Message) => void;
+  onMessageDelete?: (message: Message) => void;
   onReactionAdd?: (messageId: string, emoji: string) => void;
   onReactionRemove?: (messageId: string, emoji: string) => void;
   onReplyPress?: (messageId: string) => void;
   onLoadMore?: () => Promise<Message[]>;
   onUserPress?: (userId: string) => void;
+  onMentionPress?: (username: string) => void;
+  onLinkPress?: (url: string) => void;
+  onEmailPress?: (email: string) => void;
+  onPhonePress?: (phone: string) => void;
   onAttachmentPress?: () => void;
   onBackPress?: () => void;
   onHeaderTitlePress?: () => void;

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Alert, StatusBar } from 'react-native';
+import { Alert, Clipboard, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
   MessengerEngine,
@@ -39,6 +39,13 @@ export default function App() {
     Alert.alert('Заголовок', 'Клик по аватарке/названию — редирект в профиль и т.д.');
   };
 
+  const handleMessageCopy = (message: Message) => {
+    if (message.text) {
+      Clipboard.setString(message.text);
+      Alert.alert('Скопировано', 'Текст сообщения скопирован');
+    }
+  };
+
   const handleSendMessage = (text: string) => {
     const nextMessage: Message = {
       id: `${Date.now()}`,
@@ -64,6 +71,18 @@ export default function App() {
         onSendMessage={handleSendMessage}
         theme={nightTheme}
         typingUsers={[{ id: 'u2', name: 'Melissa Jones' }]}
+        disableReactions
+        onMentionPress={(username) => {
+          Alert.alert(`Меню пользователя ${username}`);
+        }}
+        onReplyPress={(messageId) => {
+          Alert.alert('Reply', `Ответ на сообщение ${messageId}`);
+        }}
+        onMessageEdit={(msg) => Alert.alert('Edit', `Редактировать: ${msg.text}`)}
+        onMessageForward={(msg) => Alert.alert('Forward', `Переслать: ${msg.text}`)}
+        onMessageCopy={handleMessageCopy}
+        onMessageReport={(msg) => Alert.alert('Report', `Пожаловаться на сообщение`)}
+        onMessageDelete={(msg) => Alert.alert('Delete', 'Удалить сообщение?')}
       />
     </KeyboardProvider>
   );
