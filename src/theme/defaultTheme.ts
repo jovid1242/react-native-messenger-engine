@@ -12,6 +12,7 @@ export const defaultTheme: MessengerTheme = {
     inputBackground: '#171a26',
     separator: '#2a2e42',
     destructive: '#ff4d4f',
+    linkColor: '#8690ff',
   },
   spacing: {
     xs: 4,

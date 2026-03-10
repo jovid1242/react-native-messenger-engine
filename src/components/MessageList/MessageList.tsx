@@ -18,12 +18,22 @@ interface MessageListProps {
   messages: Message[];
   currentUser: User;
   onLoadMore?: () => Promise<Message[]>;
+  onMentionPress?: (username: string) => void;
+  onLinkPress?: (url: string) => void;
+  onEmailPress?: (email: string) => void;
+  onPhonePress?: (phone: string) => void;
+  onRequestMessageContextMenu?: (
+    message: Message,
+    position: { x: number; y: number; width: number; height: number },
+    isCurrentUser?: boolean
+  ) => void;
   renderMessage?: (props: MessageRenderProps) => React.ReactNode;
   renderDateSeparator?: (props: DateSeparatorRenderProps) => React.ReactNode;
   groupByUser?: boolean;
   groupThreshold?: number;
   timeFormat?: '12h' | '24h';
   theme?: MessengerTheme;
+  disableReactions?: boolean;
   /** When false (1-on-1 chat), do not show sender name/avatar above messages */
   isGroup?: boolean;
 }
@@ -33,12 +43,18 @@ export const MessageList = memo<MessageListProps>(
     messages,
     currentUser,
     onLoadMore,
+    onMentionPress,
+    onLinkPress,
+    onEmailPress,
+    onPhonePress,
+    onRequestMessageContextMenu,
     renderMessage,
     renderDateSeparator,
     groupByUser = true,
     groupThreshold = 300000,
     timeFormat = '24h',
     theme,
+    disableReactions,
     isGroup = true,
   }) => {
     const data = useMemo<ChatListItem[]>(() => {
@@ -68,6 +84,12 @@ export const MessageList = memo<MessageListProps>(
             group={item}
             currentUserId={currentUser.id}
             isGroup={isGroup}
+            onMentionPress={onMentionPress}
+            onLinkPress={onLinkPress}
+            onEmailPress={onEmailPress}
+            onPhonePress={onPhonePress}
+            onRequestMessageContextMenu={onRequestMessageContextMenu}
+            disableReactions={disableReactions}
             theme={theme}
             timeFormat={timeFormat}
             renderMessage={(message, isCurrentUser) =>
@@ -89,6 +111,12 @@ export const MessageList = memo<MessageListProps>(
         <MessageItem
           isCurrentUser={isCurrentUser}
           message={item}
+          onMentionPress={onMentionPress}
+          onLinkPress={onLinkPress}
+          onEmailPress={onEmailPress}
+          onPhonePress={onPhonePress}
+          onRequestMessageContextMenu={onRequestMessageContextMenu}
+          disableReactions={disableReactions}
           theme={theme}
           timeFormat={timeFormat}
         />

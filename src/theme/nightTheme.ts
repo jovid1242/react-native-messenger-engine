@@ -25,6 +25,8 @@ export const nightTheme: MessengerTheme = {
     otherMessage: '#232324', // Incoming
     // State
     destructive: '#FA4C56', // Error
+    // Message highlights (@mention, links, phone)
+    linkColor: '#A795DF',
   },
   spacing: {
     xs: 4,
