@@ -8,6 +8,7 @@ export type { MessengerEngineProps as NativeViewProps } from './MessengerEngine.
 export type * from './types';
 export { ChatContainer as MessengerEngine } from './components/ChatContainer';
 export { defaultTheme } from './theme/defaultTheme';
+export { nightTheme, nightThemePalette } from './theme/nightTheme';
 
 export const MessengerEngineView = getHostComponent<
   NativeMessengerEngineProps,

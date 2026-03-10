@@ -1,5 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import type { MessengerEngineProps } from '../types';
 import { useMessages } from '../hooks/useMessages';
 import { useReply } from '../hooks/useReply';
@@ -15,6 +16,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     currentUser,
     messages,
     onAttachmentPress,
+    onBackPress,
+    onHeaderTitlePress,
     onSendMessage,
     renderDateSeparator,
     renderHeader,
@@ -60,17 +63,26 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
+      keyboardVerticalOffset={0}
       style={[
         styles.container,
         { backgroundColor: mergedTheme.colors.background },
       ]}
     >
       {renderHeader ? (
-        renderHeader({ chatInfo, typingUsers })
+        renderHeader({
+          chatInfo,
+          typingUsers: disableTypingIndicator ? undefined : typingUsers,
+          onBackPress,
+          onHeaderTitlePress,
+        })
       ) : (
         <Header
           chatInfo={chatInfo}
+          onBackPress={onBackPress}
+          onHeaderTitlePress={onHeaderTitlePress}
+          theme={mergedTheme}
           typingUsers={disableTypingIndicator ? undefined : typingUsers}
         />
       )}
@@ -79,15 +91,18 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           currentUser={currentUser}
           groupByUser={groupMessagesByUser}
           groupThreshold={groupMessagesThreshold}
+          isGroup={chatInfo.isGroup}
           messages={parsedMessages}
           onLoadMore={props.onLoadMore}
           renderDateSeparator={renderDateSeparator}
+          theme={mergedTheme}
           renderMessage={
             renderMessage ??
             ((messageProps) => (
               <MessageItem
                 isCurrentUser={messageProps.isCurrentUser}
                 message={messageProps.message}
+                theme={mergedTheme}
                 timeFormat={timeFormat}
               />
             ))
@@ -107,6 +122,7 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           onAttachmentPress={onAttachmentPress}
           onChangeText={setText}
           onSend={handleSend}
+          theme={mergedTheme}
           value={text}
         />
       )}
@@ -120,7 +136,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingTop: 8,
+    paddingHorizontal: 10, 
   },
 });

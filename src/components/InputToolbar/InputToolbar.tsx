@@ -1,5 +1,6 @@
 import { memo, useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import type { MessengerTheme } from '../../types';
 import { ActionsMenu } from './ActionsMenu';
 import { AttachmentButton } from './AttachmentButton';
 import { InputField } from './InputField';
@@ -11,12 +12,25 @@ interface InputToolbarProps {
   onSend: () => void;
   onAttachmentPress?: () => void;
   maxInputLength?: number;
+  theme?: MessengerTheme;
 }
 
+const defaultWrapperBg = '#0f1118';
+const defaultBorderColor = '#1d2133';
+
 export const InputToolbar = memo<InputToolbarProps>(
-  ({ value, onChangeText, onSend, onAttachmentPress, maxInputLength }) => {
+  ({
+    value,
+    onChangeText,
+    onSend,
+    onAttachmentPress,
+    maxInputLength,
+    theme,
+  }) => {
     const [isMenuVisible, setMenuVisible] = useState(false);
     const isSendDisabled = value.trim().length === 0;
+    const wrapperBg = theme?.colors?.background ?? defaultWrapperBg;
+    const borderColor = theme?.colors?.separator ?? defaultBorderColor;
 
     const handleAttachmentPress = useCallback(() => {
       onAttachmentPress?.();
@@ -24,15 +38,28 @@ export const InputToolbar = memo<InputToolbarProps>(
     }, [onAttachmentPress]);
 
     return (
-      <View style={styles.wrapper}>
+      <View
+        style={[
+          styles.wrapper,
+          {
+            backgroundColor: wrapperBg,
+            borderTopColor: borderColor,
+          },
+        ]}
+      >
         <View style={styles.container}>
-          <AttachmentButton onPress={handleAttachmentPress} />
+          <AttachmentButton onPress={handleAttachmentPress} theme={theme} />
           <InputField
             maxLength={maxInputLength}
             onChangeText={onChangeText}
+            theme={theme}
             value={value}
           />
-          <SendButton disabled={isSendDisabled} onPress={onSend} />
+          <SendButton
+            disabled={isSendDisabled}
+            onPress={onSend}
+            theme={theme}
+          />
         </View>
         <ActionsMenu
           onClose={() => setMenuVisible(false)}
@@ -45,19 +72,14 @@ export const InputToolbar = memo<InputToolbarProps>(
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-end',
-    backgroundColor: '#111420',
-    borderRadius: 20,
+    alignItems: 'center',
     flexDirection: 'row',
-    marginHorizontal: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 6,
+    gap: 10,
+    marginHorizontal: 12,
+    paddingBottom: 8,
+    paddingTop: 10,
   },
   wrapper: {
-    backgroundColor: '#0f1118',
-    borderTopColor: '#1d2133',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingBottom: 8,
-    paddingTop: 6,
+    // borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

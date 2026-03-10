@@ -5,6 +5,7 @@ import type {
   DateSeparatorRenderProps,
   Message,
   MessageRenderProps,
+  MessengerTheme,
   User,
 } from '../../types';
 import type { ChatListItem } from '../../utils/messageGrouper';
@@ -22,6 +23,9 @@ interface MessageListProps {
   groupByUser?: boolean;
   groupThreshold?: number;
   timeFormat?: '12h' | '24h';
+  theme?: MessengerTheme;
+  /** When false (1-on-1 chat), do not show sender name/avatar above messages */
+  isGroup?: boolean;
 }
 
 export const MessageList = memo<MessageListProps>(
@@ -34,6 +38,8 @@ export const MessageList = memo<MessageListProps>(
     groupByUser = true,
     groupThreshold = 300000,
     timeFormat = '24h',
+    theme,
+    isGroup = true,
   }) => {
     const data = useMemo<ChatListItem[]>(() => {
       if (!groupByUser) {
@@ -52,7 +58,7 @@ export const MessageList = memo<MessageListProps>(
         return renderDateSeparator ? (
           <>{renderDateSeparator(item)}</>
         ) : (
-          <DateSeparator formattedDate={item.formattedDate} />
+          <DateSeparator formattedDate={item.formattedDate} theme={theme} />
         );
       }
 
@@ -61,6 +67,8 @@ export const MessageList = memo<MessageListProps>(
           <MessageGroup
             group={item}
             currentUserId={currentUser.id}
+            isGroup={isGroup}
+            theme={theme}
             timeFormat={timeFormat}
             renderMessage={(message, isCurrentUser) =>
               renderMessage?.({
@@ -81,6 +89,7 @@ export const MessageList = memo<MessageListProps>(
         <MessageItem
           isCurrentUser={isCurrentUser}
           message={item}
+          theme={theme}
           timeFormat={timeFormat}
         />
       );
@@ -94,6 +103,7 @@ export const MessageList = memo<MessageListProps>(
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.35}
         renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
       />
     );
   }

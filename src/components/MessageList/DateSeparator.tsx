@@ -1,17 +1,28 @@
 import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import type { MessengerTheme } from '../../types';
 
 interface DateSeparatorProps {
   formattedDate: string;
+  theme?: MessengerTheme;
 }
 
-export const DateSeparator = memo<DateSeparatorProps>(({ formattedDate }) => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{formattedDate}</Text>
-    </View>
-  );
-});
+const defaultBg = '#0a0c13';
+const defaultColor = '#9199b6';
+
+export const DateSeparator = memo<DateSeparatorProps>(
+  ({ formattedDate, theme }) => {
+    const bg = theme?.colors?.secondary ?? defaultBg;
+    const color = theme?.colors?.mutedText ?? defaultColor;
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.text, { backgroundColor: bg, color }]}>
+          {formattedDate}
+        </Text>
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -19,9 +30,7 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   text: {
-    backgroundColor: '#0a0c13',
     borderRadius: 12,
-    color: '#9199b6',
     fontSize: 12,
     overflow: 'hidden',
     paddingHorizontal: 10,

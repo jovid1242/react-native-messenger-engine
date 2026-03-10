@@ -114,6 +114,8 @@ export interface ChatInfo {
 export interface HeaderRenderProps {
   chatInfo: ChatInfo;
   typingUsers?: User[];
+  onBackPress?: () => void;
+  onHeaderTitlePress?: () => void;
 }
 
 export interface MessageRenderProps {
@@ -148,6 +150,8 @@ export interface MessengerEngineProps {
   onLoadMore?: () => Promise<Message[]>;
   onUserPress?: (userId: string) => void;
   onAttachmentPress?: () => void;
+  onBackPress?: () => void;
+  onHeaderTitlePress?: () => void;
   typingUsers?: User[];
   isLoading?: boolean;
   hasMore?: boolean;
