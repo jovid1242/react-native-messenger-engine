@@ -39,7 +39,7 @@ export const MessageGroup = memo<MessageGroupProps>(
             <Text style={styles.userName}>{group.userName}</Text>
           </View>
         ) : null}
-        {group.messages.map((message) => (
+        {[...group.messages].reverse().map((message) => (
           <View
             key={message.id}
             style={isCurrentUser ? styles.right : styles.left}

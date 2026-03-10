@@ -16,6 +16,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     currentUser,
     messages,
     onAttachmentPress,
+    onBackPress,
+    onHeaderTitlePress,
     onSendMessage,
     renderDateSeparator,
     renderHeader,
@@ -69,10 +71,18 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
       ]}
     >
       {renderHeader ? (
-        renderHeader({ chatInfo, typingUsers })
+        renderHeader({
+          chatInfo,
+          typingUsers: disableTypingIndicator ? undefined : typingUsers,
+          onBackPress,
+          onHeaderTitlePress,
+        })
       ) : (
         <Header
           chatInfo={chatInfo}
+          onBackPress={onBackPress}
+          onHeaderTitlePress={onHeaderTitlePress}
+          theme={mergedTheme}
           typingUsers={disableTypingIndicator ? undefined : typingUsers}
         />
       )}
@@ -126,7 +136,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingTop: 8,
+    paddingHorizontal: 10, 
   },
 });

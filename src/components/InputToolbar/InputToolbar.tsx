@@ -16,7 +16,6 @@ interface InputToolbarProps {
 }
 
 const defaultWrapperBg = '#0f1118';
-const defaultContainerBg = '#111420';
 const defaultBorderColor = '#1d2133';
 
 export const InputToolbar = memo<InputToolbarProps>(
@@ -31,7 +30,6 @@ export const InputToolbar = memo<InputToolbarProps>(
     const [isMenuVisible, setMenuVisible] = useState(false);
     const isSendDisabled = value.trim().length === 0;
     const wrapperBg = theme?.colors?.background ?? defaultWrapperBg;
-    const containerBg = theme?.colors?.inputBackground ?? defaultContainerBg;
     const borderColor = theme?.colors?.separator ?? defaultBorderColor;
 
     const handleAttachmentPress = useCallback(() => {
@@ -49,15 +47,19 @@ export const InputToolbar = memo<InputToolbarProps>(
           },
         ]}
       >
-        <View style={[styles.container, { backgroundColor: containerBg }]}>
-          <AttachmentButton onPress={handleAttachmentPress} />
+        <View style={styles.container}>
+          <AttachmentButton onPress={handleAttachmentPress} theme={theme} />
           <InputField
             maxLength={maxInputLength}
             onChangeText={onChangeText}
             theme={theme}
             value={value}
           />
-          <SendButton disabled={isSendDisabled} onPress={onSend} />
+          <SendButton
+            disabled={isSendDisabled}
+            onPress={onSend}
+            theme={theme}
+          />
         </View>
         <ActionsMenu
           onClose={() => setMenuVisible(false)}
@@ -70,16 +72,14 @@ export const InputToolbar = memo<InputToolbarProps>(
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-end',
-    borderRadius: 20,
+    alignItems: 'center',
     flexDirection: 'row',
-    marginHorizontal: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 6,
+    gap: 10,
+    marginHorizontal: 12,
+    paddingBottom: 8,
+    paddingTop: 10,
   },
   wrapper: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingBottom: 8,
-    paddingTop: 6,
+    // borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

@@ -16,6 +16,7 @@ export const InputField = memo<InputFieldProps>(
   ({ value, onChangeText, maxLength, theme }) => {
     const textColor = theme?.colors?.text ?? defaultTextColor;
     const placeholderColor = theme?.colors?.mutedText ?? defaultPlaceholderColor;
+    const pillBg = theme?.colors?.inputBackground ?? '#303032';
     return (
       <TextInput
         maxLength={maxLength}
@@ -23,7 +24,11 @@ export const InputField = memo<InputFieldProps>(
         onChangeText={onChangeText}
         placeholder="Write a message..."
         placeholderTextColor={placeholderColor}
-        style={[styles.input, { color: textColor }]}
+        style={[
+          styles.pill,
+          styles.input,
+          { color: textColor, backgroundColor: pillBg },
+        ]}
         value={value}
       />
     );
@@ -35,7 +40,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     maxHeight: 120,
-    paddingHorizontal: 8,
-    paddingVertical: 7,
+    minHeight: 44,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  pill: {
+    borderRadius: 22,
   },
 });

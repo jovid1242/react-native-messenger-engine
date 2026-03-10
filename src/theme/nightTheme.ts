@@ -21,7 +21,7 @@ export const nightTheme: MessengerTheme = {
     text: '#E1E3E6', // Primary
     mutedText: '#969A9F', // Secondary / Icon Secondary
     // Bubble
-    userMessage: '#7253F6', // Outgoing (own messages)
+    userMessage: '#212239', // Outgoing
     otherMessage: '#232324', // Incoming
     // State
     destructive: '#FA4C56', // Error
@@ -55,7 +55,7 @@ export const nightThemePalette = {
     onPrimary: '#FFFFFF',
   },
   bubble: {
-    outgoing: '#7253F6',
+    outgoing: '#212239',
     outgoingAlt: '#2E3052',
     incoming: '#232324',
     incomingAlt: '#303032',

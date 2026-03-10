@@ -1,27 +1,31 @@
 import { memo } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
+import type { MessengerTheme } from '../../types';
+import { AttachmentIcon } from '../../assets/icons/AttachmentIcon';
 
 interface AttachmentButtonProps {
   onPress?: () => void;
+  theme?: MessengerTheme;
 }
 
-export const AttachmentButton = memo<AttachmentButtonProps>(({ onPress }) => {
-  return (
-    <Pressable style={styles.button} onPress={onPress}>
-      <Text style={styles.icon}>⌁</Text>
-    </Pressable>
-  );
-});
+const defaultIconColor = '#76787A';
+
+export const AttachmentButton = memo<AttachmentButtonProps>(
+  ({ onPress, theme }) => {
+    const iconColor = theme?.colors?.mutedText ?? defaultIconColor;
+    return (
+      <Pressable style={styles.button} onPress={onPress}>
+        <AttachmentIcon color={iconColor} width={22} height={26} />
+      </Pressable>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
-    height: 36,
+    height: 44,
     justifyContent: 'center',
-    width: 36,
-  },
-  icon: {
-    color: '#8d95b5',
-    fontSize: 22,
+    width: 44,
   },
 });

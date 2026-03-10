@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { StatusBar } from 'react-native';
+import { Alert, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
   MessengerEngine,
@@ -31,6 +31,14 @@ export default function App() {
     []
   );
 
+  const handleBackPress = () => {
+    Alert.alert('Назад', 'Можно выполнить навигацию назад');
+  };
+
+  const handleHeaderTitlePress = () => {
+    Alert.alert('Заголовок', 'Клик по аватарке/названию — редирект в профиль и т.д.');
+  };
+
   const handleSendMessage = (text: string) => {
     const nextMessage: Message = {
       id: `${Date.now()}`,
@@ -51,6 +59,8 @@ export default function App() {
         chatInfo={chatInfo}
         currentUser={currentUser}
         messages={messages}
+        onBackPress={handleBackPress}
+        onHeaderTitlePress={handleHeaderTitlePress}
         onSendMessage={handleSendMessage}
         theme={nightTheme}
         typingUsers={[{ id: 'u2', name: 'Melissa Jones' }]}
