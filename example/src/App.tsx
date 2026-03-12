@@ -99,6 +99,37 @@ const seedMessages: Message[] = [
     isDeleted: true,
   },
   {
+    id: 'm4-img',
+    type: 'image',
+    image:
+      'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+    sender: { id: 'u2', name: 'Melissa Jones' },
+    timestamp: new Date('2024-11-17T10:11:00'),
+    status: 'read',
+    reactions: [],
+  },
+  {
+    id: 'm4-img-txt',
+    type: 'image',
+    image:
+      'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+    text: 'Вот как получилось в красном 👗',
+    sender: { id: 'u-current', name: 'You' },
+    timestamp: new Date('2024-11-17T10:10:00'),
+    status: 'read',
+    reactions: [],
+  },
+  {
+    id: 'm4-img-only1',
+    type: 'image',
+    image:
+      'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+    sender: { id: 'u-current', name: 'You' },
+    timestamp: new Date('2024-11-17T10:10:00'),
+    status: 'read',
+    reactions: [],
+  },
+  {
     id: 'm4',
     type: 'text',
     text: '@Melissa agreed',

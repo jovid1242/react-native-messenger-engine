@@ -50,6 +50,7 @@ export const MessageItem = memo<MessageItemProps>(
     const otherBg = theme?.colors?.otherMessage ?? defaultBubbleIncoming;
     const timeColor = theme?.colors?.mutedText ?? defaultTimeColor;
     const statusColor = theme?.colors?.primary ?? defaultStatusColor;
+    const textColor = theme?.colors?.text;
 
     const handleLongPress = () => {
       if (!onRequestMessageContextMenu) return;
@@ -60,12 +61,26 @@ export const MessageItem = memo<MessageItemProps>(
       );
     };
 
+    const isImageWithText =
+      message.type === 'image' &&
+      !message.isDeleted &&
+      Boolean(message.image && message.text);
+    const isImageOnly =
+      message.type === 'image' && !message.isDeleted && Boolean(message.image) && !message.text;
+    const isImageBubble = message.type === 'image' && !message.isDeleted;
+    const bubbleStyle = [
+      styles.bubble,
+      isImageWithText && styles.bubbleImageWithText,
+      isImageOnly && styles.bubbleImageOnly,
+      isImageBubble && styles.bubbleMedia,
+    ].filter(Boolean);
+
     const bubbleContent = (
       <View
         ref={bubbleRef as any}
         collapsable={false}
         style={[
-          styles.bubble,
+          bubbleStyle,
           isCurrentUser
             ? [styles.userBubble, { backgroundColor: userBg }]
             : [styles.otherBubble, { backgroundColor: otherBg }],
@@ -85,21 +100,40 @@ export const MessageItem = memo<MessageItemProps>(
             />
           ) : null}
           {message.type === 'image' && !message.isDeleted ? (
-            <MediaMessage message={message} />
+            <MediaMessage
+              message={message}
+              textColor={textColor}
+              metaOverlay={
+                isImageOnly ? (
+                  <View style={styles.metaCapsule}>
+                    <Text style={[styles.timeCapsule, { color: '#e0e0e0' }]}>
+                      {formatMessageTime(new Date(message.timestamp), timeFormat)}
+                    </Text>
+                    {isCurrentUser ? (
+                      <Text style={[styles.statusCapsule, { color: '#e0e0e0' }]}>
+                        {message.status === 'read' ? '✓✓' : '✓'}
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : undefined
+              }
+            />
           ) : null}
           {message.type === 'sticker' && !message.isDeleted ? (
             <StickerMessage message={message} />
           ) : null}
-          <View style={styles.meta}>
-            <Text style={[styles.time, { color: timeColor }]}>
-              {formatMessageTime(new Date(message.timestamp), timeFormat)}
-            </Text>
-            {isCurrentUser ? (
-              <Text style={[styles.status, { color: statusColor }]}>
-                {message.status === 'read' ? '✓✓' : '✓'}
+          {!isImageOnly ? (
+            <View style={styles.meta}>
+              <Text style={[styles.time, { color: timeColor }]}>
+                {formatMessageTime(new Date(message.timestamp), timeFormat)}
               </Text>
-            ) : null}
-          </View>
+              {isCurrentUser ? (
+                <Text style={[styles.status, { color: statusColor }]}>
+                  {message.status === 'read' ? '✓✓' : '✓'}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
         </View>
     );
 
@@ -144,12 +178,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
+  bubbleImageWithText: {
+    paddingTop: 1,
+    paddingLeft: 1,
+    paddingRight: 1,
+    paddingBottom: 6,
+  },
+  bubbleImageOnly: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  bubbleMedia: {
+    width: '85%',
+  },
   meta: {
     alignItems: 'center',
     flexDirection: 'row',
     gap: 6,
     justifyContent: 'flex-end',
     marginTop: 2,
+  },
+  metaCapsule: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   otherBubble: {},
   reactionsRow: {
@@ -159,10 +211,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   status: {
-    fontSize: 12,
+    fontSize: 10,
+  },
+  statusCapsule: {
+    fontSize: 10,
   },
   time: {
-    fontSize: 12,
+    fontSize: 10,
+  },
+  timeCapsule: {
+    fontSize: 10,
   },
   userBubble: {},
   wrapper: {
