@@ -1,5 +1,7 @@
-import { memo, useCallback, useMemo, useRef, useEffect } from 'react';
+import { memo, useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import type {
   DateSeparatorRenderProps,
@@ -8,12 +10,18 @@ import type {
   MessengerTheme,
   User,
 } from '../../types';
+import { ChevronDownIcon } from '../../assets/icons/ChevronDownIcon';
 import { ReplyScrollProvider } from '../../contexts/ReplyScrollContext';
 import type { ChatListItem } from '../../utils/messageGrouper';
 import { findIndexForMessageId, groupMessagesBySender } from '../../utils/messageGrouper';
 import { DateSeparator } from './DateSeparator';
 import { MessageGroup } from './MessageGroup';
 import { MessageItem } from './MessageItem';
+
+export interface ScrollToBottomButtonRenderProps {
+  onPress: () => void;
+  visible: boolean;
+}
 
 interface MessageListProps {
   messages: Message[];
@@ -39,6 +47,10 @@ interface MessageListProps {
   isGroup?: boolean;
   /** Locale for date separator (e.g. ru from 'date-fns/locale'). Uses date-fns for translation. */
   dateSeparatorLocale?: import('date-fns').Locale;
+  /** Порог скролла (px): кнопка "вниз" показывается, когда пользователь проскроллил выше этого значения. По умолчанию 300. */
+  scrollToBottomThreshold?: number;
+  /** Кастомная кнопка "scroll to bottom". Если не передана, используется кнопка с ChevronDownIcon. */
+  renderScrollToBottomButton?: (props: ScrollToBottomButtonRenderProps) => React.ReactNode;
 }
 
 export const MessageList = memo<MessageListProps>(
@@ -60,9 +72,12 @@ export const MessageList = memo<MessageListProps>(
     disableReactions,
     isGroup = true,
     dateSeparatorLocale,
+    scrollToBottomThreshold = 300,
+    renderScrollToBottomButton,
   }) => {
     const listRef = useRef<FlashListRef<ChatListItem> | null>(null);
     const prevMessagesLengthRef = useRef(messages.length);
+    const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
     const data = useMemo<ChatListItem[]>(() => {
       if (!groupByUser) {
@@ -94,6 +109,19 @@ export const MessageList = memo<MessageListProps>(
         }, 100);
       },
       [data]
+    );
+
+    const scrollToBottom = useCallback(() => {
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      setShowScrollToBottom(false);
+    }, []);
+
+    const handleScroll = useCallback(
+      (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const y = e.nativeEvent.contentOffset.y;
+        setShowScrollToBottom(y > scrollToBottomThreshold);
+      },
+      [scrollToBottomThreshold]
     );
 
     const renderItem = ({
@@ -154,19 +182,66 @@ export const MessageList = memo<MessageListProps>(
       );
     };
 
+    const scrollToBottomButtonContent =
+      renderScrollToBottomButton?.({
+        onPress: scrollToBottom,
+        visible: showScrollToBottom,
+      }) ??
+      (showScrollToBottom ? (
+        <Pressable
+          style={({ pressed }) => [
+            styles.scrollToBottomButton,
+            pressed && styles.scrollToBottomButtonPressed,
+          ]}
+          onPress={scrollToBottom}
+        >
+          <ChevronDownIcon
+            color={theme?.colors?.primary ?? '#8690ff'}
+            width={24}
+            height={24}
+          />
+        </Pressable>
+      ) : null);
+
     return (
       <ReplyScrollProvider onScrollToMessage={scrollToMessage}>
-        <FlashList
-        ref={listRef}
-        data={data}
-        inverted
-        keyExtractor={(item) => item.id}
-        onEndReached={onLoadMore}
-        onEndReachedThreshold={0.35}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-      />
+        <View style={styles.listWrapper}>
+          <FlashList
+            ref={listRef}
+            data={data}
+            inverted
+            keyExtractor={(item) => item.id}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            onEndReached={onLoadMore}
+            onEndReachedThreshold={0.35}
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+          />
+          {scrollToBottomButtonContent}
+        </View>
       </ReplyScrollProvider>
     );
   }
 );
+
+const styles = StyleSheet.create({
+  listWrapper: {
+    flex: 1,
+    position: 'relative',
+  },
+  scrollToBottomButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollToBottomButtonPressed: {
+    opacity: 0.8,
+  },
+});

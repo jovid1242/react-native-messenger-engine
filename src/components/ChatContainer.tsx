@@ -43,6 +43,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     timeFormat = '24h',
     theme,
     dateSeparatorLocale,
+    scrollToBottomThreshold,
+    renderScrollToBottomButton,
   } = props;
   const [text, setText] = useState('');
   const [contextMenu, setContextMenu] = useState<{
@@ -131,6 +133,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           onRequestMessageContextMenu={handleRequestMessageContextMenu}
           renderDateSeparator={renderDateSeparator}
           dateSeparatorLocale={dateSeparatorLocale}
+          scrollToBottomThreshold={scrollToBottomThreshold}
+          renderScrollToBottomButton={renderScrollToBottomButton}
           theme={mergedTheme}
           renderMessage={
             renderMessage ??

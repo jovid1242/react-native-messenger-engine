@@ -182,4 +182,11 @@ export interface MessengerEngineProps {
   dateSeparatorLocale?: Locale;
   groupMessagesByUser?: boolean;
   groupMessagesThreshold?: number;
+  /** Порог (px) для показа кнопки "scroll to bottom". По умолчанию 300. */
+  scrollToBottomThreshold?: number;
+  /** Кастомная кнопка "scroll to bottom". Передаётся { onPress, visible }. */
+  renderScrollToBottomButton?: (props: {
+    onPress: () => void;
+    visible: boolean;
+  }) => ReactNode;
 }
