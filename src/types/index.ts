@@ -1,3 +1,4 @@
+import type { Locale } from 'date-fns';
 import type { TextStyle, ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
 
@@ -177,6 +178,8 @@ export interface MessengerEngineProps {
   maxInputLength?: number;
   timeFormat?: '12h' | '24h';
   dateFormat?: Intl.DateTimeFormatOptions;
+  /** Locale for date separator (e.g. ru, enUS from 'date-fns/locale'). Translates "Today", "Yesterday" and weekday/month names. */
+  dateSeparatorLocale?: Locale;
   groupMessagesByUser?: boolean;
   groupMessagesThreshold?: number;
 }

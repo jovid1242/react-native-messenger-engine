@@ -1,6 +1,7 @@
-import React, { memo, useRef } from 'react';
+import { memo, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { Message, MessengerTheme } from '../../types';
+import { useReplyScroll } from '../../contexts/ReplyScrollContext';
 import { compactReactions } from '../../utils/reactionHelpers';
 import { formatMessageTime } from '../../utils/dateFormatter';
 import { ReactionBadge } from '../common/ReactionBadge';
@@ -45,6 +46,9 @@ export const MessageItem = memo<MessageItemProps>(
     theme,
   }) => {
     const bubbleRef = useRef<View>(null);
+    const replyScroll = useReplyScroll();
+    const isHighlighted =
+      replyScroll?.highlightedMessageId === message.id;
     const reactions = compactReactions(message.reactions);
     const userBg = theme?.colors?.userMessage ?? defaultBubbleOutgoing;
     const otherBg = theme?.colors?.otherMessage ?? defaultBubbleIncoming;
@@ -84,6 +88,7 @@ export const MessageItem = memo<MessageItemProps>(
           isCurrentUser
             ? [styles.userBubble, { backgroundColor: userBg }]
             : [styles.otherBubble, { backgroundColor: otherBg }],
+          isHighlighted && styles.bubbleHighlight,
         ]}
       >
           {message.isDeleted || message.type === 'deleted' ? (
@@ -221,6 +226,9 @@ const styles = StyleSheet.create({
   },
   timeCapsule: {
     fontSize: 10,
+  },
+  bubbleHighlight: {
+    backgroundColor: 'rgba(138, 147, 255, 0.4)',
   },
   userBubble: {},
   wrapper: {

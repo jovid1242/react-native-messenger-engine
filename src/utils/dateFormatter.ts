@@ -1,29 +1,31 @@
+import {
+  format,
+  formatRelative,
+  isSameDay,
+  isToday,
+  isYesterday,
+} from 'date-fns';
+import type { Locale } from 'date-fns';
 import type { Message } from '../types';
 
-export const isToday = (date: Date): boolean => {
-  const now = new Date();
-  return date.toDateString() === now.toDateString();
-};
+export { isToday, isYesterday };
 
-export const isYesterday = (date: Date): boolean => {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return date.toDateString() === yesterday.toDateString();
-};
+/** Извлекает "today"/"yesterday" из результата formatRelative (до " at "/" в "/" um " и т.д.) */
+function getRelativeDayLabel(date: Date, baseDate: Date, locale?: Locale): string {
+  const full = formatRelative(date, baseDate, { locale });
+  const part = full.split(/\s+at\s+|\s+в\s+|\s+um\s+|\s+à\s+|\s+o\s+/i)[0]?.trim();
+  return part ?? full;
+}
 
-export const formatDateSeparator = (date: Date): string => {
+export const formatDateSeparator = (date: Date, locale?: Locale): string => {
+  const baseDate = new Date();
   if (isToday(date)) {
-    return 'Today';
+    return locale ? getRelativeDayLabel(date, baseDate, locale) : 'Today';
   }
   if (isYesterday(date)) {
-    return 'Yesterday';
+    return locale ? getRelativeDayLabel(date, baseDate, locale) : 'Yesterday';
   }
-
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
+  return format(date, 'EEE, d MMM', locale ? { locale } : undefined);
 };
 
 export const shouldShowDateSeparator = (
@@ -33,10 +35,9 @@ export const shouldShowDateSeparator = (
   if (!previousMessage) {
     return true;
   }
-
-  return (
-    new Date(currentMessage.timestamp).toDateString() !==
-    new Date(previousMessage.timestamp).toDateString()
+  return !isSameDay(
+    new Date(currentMessage.timestamp),
+    new Date(previousMessage.timestamp)
   );
 };
 
@@ -44,9 +45,5 @@ export const formatMessageTime = (
   date: Date,
   mode: '12h' | '24h' = '24h'
 ): string => {
-  return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: mode === '12h',
-  });
+  return format(date, mode === '12h' ? 'h:mm a' : 'HH:mm');
 };
