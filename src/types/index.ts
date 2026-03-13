@@ -163,7 +163,9 @@ export interface MessengerEngineProps {
   replyTo?: ReplyInfo;
   /** Вызывается при отмене ответа (крестик на превью) или после отправки. */
   onCancelReply?: () => void;
-  onLoadMore?: () => Promise<Message[]>;
+  onLoadMore?: () => void | Promise<void>;
+  /** Показывать лоадер сверху списка при подгрузке старых сообщений. Передавать true, пока идёт загрузка. */
+  isLoadingMore?: boolean;
   onUserPress?: (userId: string) => void;
   onMentionPress?: (username: string) => void;
   onLinkPress?: (url: string) => void;
@@ -174,6 +176,7 @@ export interface MessengerEngineProps {
   onHeaderTitlePress?: () => void;
   typingUsers?: User[];
   isLoading?: boolean;
+  /** Есть ли ещё страницы для подгрузки. При false onLoadMore не вызывается. */
   hasMore?: boolean;
   renderHeader?: (props: HeaderRenderProps) => ReactNode;
   renderMessage?: (props: MessageRenderProps) => ReactNode;
