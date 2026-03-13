@@ -1,6 +1,6 @@
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo, useRef, useEffect } from 'react';
 import type { ReactElement } from 'react';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import type {
   DateSeparatorRenderProps,
   Message,
@@ -8,8 +8,9 @@ import type {
   MessengerTheme,
   User,
 } from '../../types';
+import { ReplyScrollProvider } from '../../contexts/ReplyScrollContext';
 import type { ChatListItem } from '../../utils/messageGrouper';
-import { groupMessagesBySender } from '../../utils/messageGrouper';
+import { findIndexForMessageId, groupMessagesBySender } from '../../utils/messageGrouper';
 import { DateSeparator } from './DateSeparator';
 import { MessageGroup } from './MessageGroup';
 import { MessageItem } from './MessageItem';
@@ -36,6 +37,8 @@ interface MessageListProps {
   disableReactions?: boolean;
   /** When false (1-on-1 chat), do not show sender name/avatar above messages */
   isGroup?: boolean;
+  /** Locale for date separator (e.g. ru from 'date-fns/locale'). Uses date-fns for translation. */
+  dateSeparatorLocale?: import('date-fns').Locale;
 }
 
 export const MessageList = memo<MessageListProps>(
@@ -56,14 +59,42 @@ export const MessageList = memo<MessageListProps>(
     theme,
     disableReactions,
     isGroup = true,
+    dateSeparatorLocale,
   }) => {
+    const listRef = useRef<FlashListRef<ChatListItem> | null>(null);
+    const prevMessagesLengthRef = useRef(messages.length);
+
     const data = useMemo<ChatListItem[]>(() => {
       if (!groupByUser) {
         return messages;
       }
 
-      return groupMessagesBySender(messages, groupThreshold);
-    }, [messages, groupByUser, groupThreshold]);
+      return groupMessagesBySender(messages, groupThreshold, dateSeparatorLocale);
+    }, [messages, groupByUser, groupThreshold, dateSeparatorLocale]);
+
+    // При отправке своего сообщения прокручивать список вниз (в inverted списке низ = offset 0)
+    useEffect(() => {
+      const prevLen = prevMessagesLengthRef.current;
+      prevMessagesLengthRef.current = messages.length;
+      if (messages.length > prevLen && messages[0]) {
+        const newest = messages[0];
+        if (newest.sender.id === currentUser.id) {
+          setTimeout(() => {
+            listRef.current?.scrollToOffset({ offset: 0, animated: true });
+          }, 100);
+        }
+      }
+    }, [messages, currentUser.id]);
+
+    const scrollToMessage = useCallback(
+      (messageId: string) => {
+        const index = findIndexForMessageId(data, messageId);
+        setTimeout(() => {
+          listRef.current?.scrollToIndex({ index, animated: true });
+        }, 100);
+      },
+      [data]
+    );
 
     const renderItem = ({
       item,
@@ -124,7 +155,9 @@ export const MessageList = memo<MessageListProps>(
     };
 
     return (
-      <FlashList
+      <ReplyScrollProvider onScrollToMessage={scrollToMessage}>
+        <FlashList
+        ref={listRef}
         data={data}
         inverted
         keyExtractor={(item) => item.id}
@@ -133,6 +166,7 @@ export const MessageList = memo<MessageListProps>(
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
       />
+      </ReplyScrollProvider>
     );
   }
 );

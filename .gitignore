@@ -85,3 +85,6 @@ android/generated
 # React Native Nitro Modules
 nitrogen/
 injener.md
+
+# Локальная инструкция по пушу в git
+GIT_PUSH.md

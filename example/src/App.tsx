@@ -1,3 +1,4 @@
+import { ru } from 'date-fns/locale';
 import { useMemo, useState } from 'react';
 import { Alert, Clipboard, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -70,6 +71,7 @@ export default function App() {
         onHeaderTitlePress={handleHeaderTitlePress}
         onSendMessage={handleSendMessage}
         theme={nightTheme}
+        dateSeparatorLocale={ru}
         typingUsers={[{ id: 'u2', name: 'Melissa Jones' }]}
         disableReactions
         onMentionPress={(username) => {
@@ -88,12 +90,35 @@ export default function App() {
   );
 }
 
+const now = new Date();
+const msDay = 24 * 60 * 60 * 1000;
+const todayStart = new Date(now);
+todayStart.setHours(0, 0, 0, 0);
+const yesterdayStart = new Date(todayStart.getTime() - msDay);
+const twoDaysStart = new Date(todayStart.getTime() - 2 * msDay);
+
+function tsToday(h: number, m: number) {
+  const d = new Date(todayStart);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+function tsYesterday(h: number, m: number) {
+  const d = new Date(yesterdayStart);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+function tsTwoDaysAgo(h: number, m: number) {
+  const d = new Date(twoDaysStart);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
 const seedMessages: Message[] = [
   {
     id: 'm5',
     type: 'deleted',
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T10:12:00'),
+    timestamp: tsToday(10, 12),
     status: 'read',
     reactions: [],
     isDeleted: true,
@@ -104,9 +129,26 @@ const seedMessages: Message[] = [
     image:
       'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
     sender: { id: 'u2', name: 'Melissa Jones' },
-    timestamp: new Date('2024-11-17T10:11:00'),
+    timestamp: tsToday(10, 11),
     status: 'read',
     reactions: [],
+  },
+  {
+    id: 'm4-reply-photo',
+    type: 'text',
+    text: 'Классное фото! 👍',
+    sender: { id: 'u-current', name: 'You' },
+    timestamp: tsToday(10, 11),
+    status: 'read',
+    reactions: [],
+    replyTo: {
+      messageId: 'm4-img',
+      userId: 'u2',
+      userName: 'Melissa Jones',
+      type: 'image',
+      image:
+        'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+    },
   },
   {
     id: 'm4-img-txt',
@@ -115,7 +157,7 @@ const seedMessages: Message[] = [
       'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
     text: 'Вот как получилось в красном 👗',
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T10:10:00'),
+    timestamp: tsToday(10, 10),
     status: 'read',
     reactions: [],
   },
@@ -125,7 +167,7 @@ const seedMessages: Message[] = [
     image:
       'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T10:10:00'),
+    timestamp: tsToday(10, 10),
     status: 'read',
     reactions: [],
   },
@@ -134,27 +176,68 @@ const seedMessages: Message[] = [
     type: 'text',
     text: '@Melissa agreed',
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T10:12:00'),
+    timestamp: tsToday(10, 12),
     status: 'read',
     reactions: [],
+    replyTo: {
+      messageId: 'm4-img-txt',
+      userId: 'u-current',
+      userName: 'You',
+      text: 'Вот как получилось в красном 👗',
+      type: 'image',
+      image:
+        'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+    },
+  },
+  {
+    id: 'm4-reply-photo-txt',
+    type: 'text',
+    text: 'Супер получилось! 👗',
+    sender: { id: 'u2', name: 'Melissa Jones' },
+    timestamp: tsToday(10, 11),
+    status: 'read',
+    reactions: [],
+    replyTo: {
+      messageId: 'm4-img-txt',
+      userId: 'u-current',
+      userName: 'You',
+      text: 'Вот как получилось в красном 👗',
+      type: 'image',
+      image:
+        'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+    },
   },
   {
     id: 'm3',
     type: 'text',
     text: '@Robert people should understand how decisions are made by AI.',
     sender: { id: 'u2', name: 'Melissa Jones' },
-    timestamp: new Date('2024-11-17T10:08:00'),
+    timestamp: tsToday(10, 8),
     status: 'read',
     reactions: [{ emoji: '👌', userId: 'u-current', count: 4 }],
+    replyTo: {
+      messageId: 'm2',
+      userId: 'u-current',
+      userName: 'You',
+      text: "It's a complex issue",
+      type: 'text',
+    },
   },
   {
     id: 'm2',
     type: 'text',
     text: "It's a complex issue",
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T10:06:00'),
+    timestamp: tsToday(10, 6),
     status: 'read',
     reactions: [],
+    replyTo: {
+      messageId: 'm1',
+      userId: 'u1',
+      userName: 'Robert Johnson',
+      text: "Recently, there's been a lot of talk about the ethical implications of AI. What are your thoughts?",
+      type: 'text',
+    },
   },
   {
     id: 'm1',
@@ -164,7 +247,7 @@ const seedMessages: Message[] = [
       id: 'u1',
       name: 'Robert Johnson',
     },
-    timestamp: new Date('2024-11-17T10:02:00'),
+    timestamp: tsToday(10, 2),
     status: 'read',
     reactions: [
       { emoji: '😎', userId: 'u-current', count: 1 },
@@ -177,7 +260,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: 'Good morning everyone! Ready for the standup?',
     sender: { id: 'u2', name: 'Melissa Jones' },
-    timestamp: new Date('2024-11-17T09:55:00'),
+    timestamp: tsYesterday(9, 55),
     status: 'read',
     reactions: [],
   },
@@ -186,7 +269,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: "I'll share my screen in a sec",
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T09:52:00'),
+    timestamp: tsYesterday(9, 52),
     status: 'read',
     reactions: [],
   },
@@ -195,7 +278,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: 'The new API docs are live. Link in the channel description.',
     sender: { id: 'u1', name: 'Robert Johnson' },
-    timestamp: new Date('2024-11-17T09:48:00'),
+    timestamp: tsYesterday(9, 48),
     status: 'read',
     reactions: [{ emoji: '👍', userId: 'u-current', count: 2 }],
   },
@@ -204,16 +287,23 @@ const seedMessages: Message[] = [
     type: 'text',
     text: 'Thanks Robert, that helps a lot.',
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T09:45:00'),
+    timestamp: tsYesterday(9, 45),
     status: 'read',
     reactions: [],
+    replyTo: {
+      messageId: 'm8',
+      userId: 'u1',
+      userName: 'Robert Johnson',
+      text: 'The new API docs are live. Link in the channel description.',
+      type: 'text',
+    },
   },
   {
     id: 'm10',
     type: 'text',
     text: 'Did anyone try the beta build from yesterday?',
     sender: { id: 'u2', name: 'Melissa Jones' },
-    timestamp: new Date('2024-11-17T09:40:00'),
+    timestamp: tsYesterday(9, 40),
     status: 'read',
     reactions: [],
   },
@@ -222,7 +312,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: "Yes, ran it on the simulator. So far so good.",
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T09:38:00'),
+    timestamp: tsYesterday(9, 38),
     status: 'read',
     reactions: [],
   },
@@ -231,7 +321,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: 'We should ship by end of week if QA is done.',
     sender: { id: 'u1', name: 'Robert Johnson' },
-    timestamp: new Date('2024-11-17T09:35:00'),
+    timestamp: tsTwoDaysAgo(9, 35),
     status: 'read',
     reactions: [{ emoji: '🚀', userId: 'u2', count: 1 }],
   },
@@ -240,7 +330,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: 'Sounds good. I will run the final checks today.',
     sender: { id: 'u2', name: 'Melissa Jones' },
-    timestamp: new Date('2024-11-17T09:32:00'),
+    timestamp: tsTwoDaysAgo(9, 32),
     status: 'read',
     reactions: [],
   },
@@ -249,7 +339,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: 'Reminder: design review at 3pm. Please have feedback in Figma.',
     sender: { id: 'u1', name: 'Robert Johnson' },
-    timestamp: new Date('2024-11-17T09:30:00'),
+    timestamp: tsTwoDaysAgo(9, 30),
     status: 'read',
     reactions: [],
   },
@@ -258,7 +348,7 @@ const seedMessages: Message[] = [
     type: 'text',
     text: "Got it, I'll add comments by 2.",
     sender: { id: 'u-current', name: 'You' },
-    timestamp: new Date('2024-11-17T09:28:00'),
+    timestamp: tsTwoDaysAgo(9, 28),
     status: 'read',
     reactions: [],
   },

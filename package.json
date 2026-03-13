@@ -180,6 +180,7 @@
     "version": "0.57.2"
   },
   "dependencies": {
-    "@shopify/flash-list": "^2.3.0"
+    "@shopify/flash-list": "^2.3.0",
+    "date-fns": "^4.1.0"
   }
 }
