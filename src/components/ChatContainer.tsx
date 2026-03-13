@@ -47,6 +47,9 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     renderScrollToBottomButton,
     replyTo,
     onCancelReply,
+    onLoadMore,
+    isLoadingMore,
+    hasMore,
   } = props;
   const [text, setText] = useState('');
   const [contextMenu, setContextMenu] = useState<{
@@ -67,21 +70,23 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
   );
 
   const parsedMessages = useMessages(messages);
-  const mergedTheme = useMemo(
-    () => ({
-      ...defaultTheme,
+  const mergedTheme = useMemo((): import('../types').MessengerTheme => {
+    const base = defaultTheme;
+    const spacing = base.spacing
+      ? {
+          xs: theme?.spacing?.xs ?? base.spacing!.xs,
+          sm: theme?.spacing?.sm ?? base.spacing!.sm,
+          md: theme?.spacing?.md ?? base.spacing!.md,
+          lg: theme?.spacing?.lg ?? base.spacing!.lg,
+        }
+      : undefined;
+    return {
+      ...base,
       ...theme,
-      colors: {
-        ...defaultTheme.colors,
-        ...theme?.colors,
-      },
-      spacing: {
-        ...defaultTheme.spacing,
-        ...theme?.spacing,
-      },
-    }),
-    [theme]
-  );
+      colors: { ...base.colors, ...theme?.colors },
+      spacing,
+    };
+  }, [theme]);
 
   const handleSend = useCallback(() => {
     const value = text.trim();
@@ -127,7 +132,9 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
           isGroup={chatInfo.isGroup}
           messages={parsedMessages}
           onEmailPress={onEmailPress}
-          onLoadMore={props.onLoadMore}
+          onLoadMore={onLoadMore}
+          isLoadingMore={isLoadingMore}
+          hasMore={hasMore}
           onLinkPress={onLinkPress}
           onMentionPress={onMentionPress}
           onPhonePress={onPhonePress}

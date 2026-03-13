@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import type {
@@ -26,7 +26,11 @@ export interface ScrollToBottomButtonRenderProps {
 interface MessageListProps {
   messages: Message[];
   currentUser: User;
-  onLoadMore?: () => Promise<Message[]>;
+  onLoadMore?: () => void | Promise<void>;
+  /** Показывать лоадер сверху при подгрузке старых сообщений. */
+  isLoadingMore?: boolean;
+  /** Есть ли ещё страницы; при false onLoadMore не вызывается. */
+  hasMore?: boolean;
   onMentionPress?: (username: string) => void;
   onLinkPress?: (url: string) => void;
   onEmailPress?: (email: string) => void;
@@ -58,6 +62,8 @@ export const MessageList = memo<MessageListProps>(
     messages,
     currentUser,
     onLoadMore,
+    isLoadingMore = false,
+    hasMore = true,
     onMentionPress,
     onLinkPress,
     onEmailPress,
@@ -127,6 +133,21 @@ export const MessageList = memo<MessageListProps>(
       },
       [scrollToBottomThreshold]
     );
+
+    const handleEndReached = useCallback(() => {
+      if (onLoadMore && !isLoadingMore && hasMore !== false) {
+        onLoadMore();
+      }
+    }, [onLoadMore, isLoadingMore, hasMore]);
+
+    const listFooterComponent = useMemo(() => {
+      if (!isLoadingMore) return null;
+      return (
+        <View style={styles.loadMoreFooter}>
+          <ActivityIndicator size="small" color={theme?.colors?.primary ?? '#007AFF'} />
+        </View>
+      );
+    }, [isLoadingMore, theme?.colors?.primary]);
 
     const renderItem = ({
       item,
@@ -217,8 +238,9 @@ export const MessageList = memo<MessageListProps>(
             keyExtractor={(item) => item.id}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            onEndReached={onLoadMore}
+            onEndReached={handleEndReached}
             onEndReachedThreshold={0.35}
+            ListFooterComponent={listFooterComponent}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
           />
@@ -233,6 +255,11 @@ const styles = StyleSheet.create({
   listWrapper: {
     flex: 1,
     position: 'relative',
+  },
+  loadMoreFooter: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scrollToBottomButton: {
     position: 'absolute',

@@ -112,8 +112,8 @@ export default function App() {
         onMessageEdit={(msg) => Alert.alert('Edit', `Редактировать: ${msg.text}`)}
         onMessageForward={(msg) => Alert.alert('Forward', `Переслать: ${msg.text}`)}
         onMessageCopy={handleMessageCopy}
-        onMessageReport={(msg) => Alert.alert('Report', `Пожаловаться на сообщение`)}
-        onMessageDelete={(msg) => Alert.alert('Delete', 'Удалить сообщение?')}
+        onMessageReport={(_msg) => Alert.alert('Report', `Пожаловаться на сообщение`)}
+        onMessageDelete={(_msg) => Alert.alert('Delete', 'Удалить сообщение?')}
       />
     </KeyboardProvider>
   );
