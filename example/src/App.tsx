@@ -7,27 +7,52 @@ import {
   nightTheme,
   type ChatInfo,
   type Message,
+  type ReplyInfo,
   type User,
 } from 'react-native-messenger-engine';
 
+function messageToReplyInfo(m: Message): ReplyInfo {
+  return {
+    messageId: m.id,
+    userId: m.sender.id,
+    userName: m.sender.name,
+    text: m.text,
+    type: m.type,
+    image: m.image,
+  };
+}
+
 export default function App() {
   const [messages, setMessages] = useState<Message[]>(() => seedMessages);
+  const [replyTo, setReplyTo] = useState<ReplyInfo | undefined>(undefined);
   const currentUser = useMemo<User>(
     () => ({
       id: 'u-current',
       name: 'You',
+      avatar: 'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
     }),
     []
   );
   const chatInfo = useMemo<ChatInfo>(
     () => ({
       id: 'group-tech-hub',
-      name: 'Tech Hub',
+      name: 'Mellisa',
       participants: [
-        { id: 'u1', name: 'Robert Johnson' },
-        { id: 'u2', name: 'Melissa Jones' },
+        {
+          id: 'u1',
+          name: 'Robert Johnson',
+          avatar: 'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+          isOnline: true,
+        },
+        {
+          id: 'u2',
+          name: 'Melissa Jones',
+          avatar: 'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
+          isOnline: true,
+        },
       ],
       isGroup: false,
+      avatar: 'https://imgv3.fotor.com/images/slider-image/A-clear-image-of-a-woman-wearing-red-sharpened-by-Fotors-image-sharpener.jpg',
     }),
     []
   );
@@ -47,7 +72,7 @@ export default function App() {
     }
   };
 
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = (text: string, replyToPayload?: ReplyInfo) => {
     const nextMessage: Message = {
       id: `${Date.now()}`,
       text,
@@ -56,6 +81,7 @@ export default function App() {
       timestamp: new Date(),
       status: 'read',
       reactions: [],
+      replyTo: replyToPayload,
     };
     setMessages((prev) => [nextMessage, ...prev]);
   };
@@ -72,13 +98,16 @@ export default function App() {
         onSendMessage={handleSendMessage}
         theme={nightTheme}
         dateSeparatorLocale={ru}
-        typingUsers={[{ id: 'u2', name: 'Melissa Jones' }]}
+        // typingUsers={[{ id: 'u2', name: 'Melissa Jones' }]}
         disableReactions
         onMentionPress={(username) => {
           Alert.alert(`Меню пользователя ${username}`);
         }}
+        replyTo={replyTo}
+        onCancelReply={() => setReplyTo(undefined)}
         onReplyPress={(messageId) => {
-          Alert.alert('Reply', `Ответ на сообщение ${messageId}`);
+          const message = messages.find((m) => m.id === messageId);
+          if (message) setReplyTo(messageToReplyInfo(message));
         }}
         onMessageEdit={(msg) => Alert.alert('Edit', `Редактировать: ${msg.text}`)}
         onMessageForward={(msg) => Alert.alert('Forward', `Переслать: ${msg.text}`)}

@@ -137,6 +137,10 @@ export interface InputToolbarRenderProps {
   text: string;
   onChangeText: (value: string) => void;
   onSend: () => void;
+  /** Сообщение, на которое пишем ответ (при нажатии Reply в контекстном меню). */
+  replyTo?: ReplyInfo;
+  /** Отменить ответ (скрыть превью). */
+  onCancelReply?: () => void;
 }
 
 export interface MessengerEngineProps {
@@ -155,6 +159,10 @@ export interface MessengerEngineProps {
   onReactionAdd?: (messageId: string, emoji: string) => void;
   onReactionRemove?: (messageId: string, emoji: string) => void;
   onReplyPress?: (messageId: string) => void;
+  /** Сообщение, на которое пишем ответ (передаётся снаружи после onReplyPress). Превью рендерится над инпутом. */
+  replyTo?: ReplyInfo;
+  /** Вызывается при отмене ответа (крестик на превью) или после отправки. */
+  onCancelReply?: () => void;
   onLoadMore?: () => Promise<Message[]>;
   onUserPress?: (userId: string) => void;
   onMentionPress?: (username: string) => void;

@@ -3,13 +3,13 @@ import { StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import type { MessengerEngineProps } from '../types';
 import { useMessages } from '../hooks/useMessages';
-import { useReply } from '../hooks/useReply';
 import { defaultTheme } from '../theme/defaultTheme';
 import { Header } from './Header/Header';
 import { InputToolbar } from './InputToolbar/InputToolbar';
 import { MessageContextMenu } from './MessageList/MessageContextMenu';
 import { MessageItem } from './MessageList/MessageItem';
 import { MessageList } from './MessageList/MessageList';
+import { ReplyPreviewBar } from './InputToolbar/ReplyPreviewBar';
 
 export const ChatContainer = memo<MessengerEngineProps>((props) => {
   const {
@@ -45,6 +45,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     dateSeparatorLocale,
     scrollToBottomThreshold,
     renderScrollToBottomButton,
+    replyTo,
+    onCancelReply,
   } = props;
   const [text, setText] = useState('');
   const [contextMenu, setContextMenu] = useState<{
@@ -52,7 +54,6 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     position: { x: number; y: number; width: number; height: number };
     isCurrentUser?: boolean;
   } | null>(null);
-  const { replyTo, clearReply } = useReply();
 
   const handleRequestMessageContextMenu = useCallback(
     (
@@ -89,8 +90,8 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
     }
     onSendMessage(value, replyTo);
     setText('');
-    clearReply();
-  }, [clearReply, onSendMessage, replyTo, text]);
+    onCancelReply?.();
+  }, [onCancelReply, onSendMessage, replyTo, text]);
 
   return (
     <KeyboardAvoidingView
@@ -170,11 +171,20 @@ export const ChatContainer = memo<MessengerEngineProps>((props) => {
         onReport={onMessageReport}
         onDelete={onMessageDelete}
       />
+      {replyTo ? (
+        <ReplyPreviewBar
+          replyTo={replyTo}
+          onCancel={onCancelReply ?? (() => {})}
+          theme={mergedTheme}
+        />
+      ) : null}
       {renderInputToolbar ? (
         renderInputToolbar({
           text,
           onChangeText: setText,
           onSend: handleSend,
+          replyTo,
+          onCancelReply,
         })
       ) : (
         <InputToolbar

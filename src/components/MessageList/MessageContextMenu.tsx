@@ -26,7 +26,7 @@ function MenuItemIcon({
   const iconProps = { color, width: MENU_ICON_SIZE, height: MENU_ICON_SIZE };
   switch (id) {
     case 'edit':
-      return <EditIcon {...iconProps} />;
+      return <EditIcon {...iconProps} width={16} height={16} />;
     case 'reply':
       return <ReplyIcon {...iconProps} />;
     case 'forward':

@@ -6,6 +6,18 @@ A modern, scalable, and highly customizable chat engine for React Native.
 typed models, grouped messages, date separators, reactions, reply previews, and
 an extensible rendering system for building production messaging interfaces.
 
+## Screenshots
+
+<p align="center">
+  <img src="./docs/screenshots/Screenshot_1.png" width="280" alt="Chat — список сообщений" />
+  <img src="./docs/screenshots/Screenshot_2.png" width="280" alt="Чат — ответ и превью" />
+  <img src="./docs/screenshots/Screenshot_3.png" width="280" alt="Чат — интерфейс" />
+</p>
+
+*Example app: dark theme, date separators, reply preview, scroll-to-bottom button.*
+
+---
+
 ## Highlights
 
 - Modular chat architecture (`Header`, `MessageList`, `InputToolbar`, hooks, utils)
