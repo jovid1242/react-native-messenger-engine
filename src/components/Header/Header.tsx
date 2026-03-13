@@ -28,9 +28,9 @@ export const Header = memo<HeaderProps>(
     const colors = theme?.colors;
     const spacing = theme?.spacing;
 
-    const backgroundColor = colors?.secondary ?? '#1a1d2a'; 
+    const backgroundColor = colors?.secondary ?? '#1a1d2a';
     const titleColor = colors?.text ?? '#f2f4ff';
-    const subtitleColor = colors?.mutedText ?? '#8187a3'; 
+    const subtitleColor = colors?.primary ?? '#ffffff';
     const paddingV = spacing?.md ?? 10;
     const gapAfterBack = spacing?.md ?? 12;
     const gapAvatarText = spacing?.md ?? 12;
@@ -42,10 +42,12 @@ export const Header = memo<HeaderProps>(
         </Text>
       ) : (
         <View style={styles.subtitleWrap}>
-          <Text style={[styles.subtitle, { color: subtitleColor }]}>
+
+          {typingUsers && typingUsers.length > 0 ? (
+            <TypingIndicator users={typingUsers} subtitleColor={subtitleColor} />
+          ) : <Text style={[styles.subtitle, { color: subtitleColor }]}>
             {statusText}
-          </Text>
-          <TypingIndicator users={typingUsers} subtitleColor={subtitleColor} />
+          </Text>}
         </View>
       );
 
@@ -54,7 +56,7 @@ export const Header = memo<HeaderProps>(
         style={[
           styles.container,
           {
-            backgroundColor, 
+            backgroundColor,
             paddingTop: paddingV,
             paddingBottom: paddingV,
           },
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: 'row',
-    alignItems: 'center',  
+    alignItems: 'center',
   },
   content: {
     flex: 1,

@@ -105,7 +105,11 @@ export const MessageList = memo<MessageListProps>(
       (messageId: string) => {
         const index = findIndexForMessageId(data, messageId);
         setTimeout(() => {
-          listRef.current?.scrollToIndex({ index, animated: true });
+          listRef.current?.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0.5,
+          });
         }, 100);
       },
       [data]
@@ -196,7 +200,7 @@ export const MessageList = memo<MessageListProps>(
           onPress={scrollToBottom}
         >
           <ChevronDownIcon
-            color={theme?.colors?.primary ?? '#8690ff'}
+            color={'#ffffff'}
             width={24}
             height={24}
           />
@@ -233,11 +237,11 @@ const styles = StyleSheet.create({
   scrollToBottomButton: {
     position: 'absolute',
     bottom: 16,
-    right: 16,
+    right: 0,
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(39, 39, 39, 0.64)',
     alignItems: 'center',
     justifyContent: 'center',
   },
